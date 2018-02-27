@@ -1,17 +1,10 @@
 var express = require('express');
 var router = express.Router();
 const User = require('../models/user');
-// requirng a directory like this simply tells express to load the index.js file in the directory in question
-const mid = require('../middleware'); 
+const mid = require('../middleware');
 
 // GET /profile
 router.get('/profile', mid.requiresLogin, function(req, res, next) {
-	console.log(req.session);
-  if (! req.session.userId ) {
-    var err = new Error("You are not authorized to view this page.");
-    err.status = 403;
-    return next(err);
-  }
   User.findById(req.session.userId)
       .exec(function (error, user) {
         if (error) {
@@ -45,23 +38,25 @@ router.get('/login', mid.loggedOut, (req, res, next) => {
 router.post('/login', (req, res, next) => {
 	if (req.body.email && req.body.password) {
 		User.authenticate(req.body.email, req.body.password, function(error, user) {
-			if ( error || !user ){
+			if (error || !user){
 				var err = new Error('Wrong email or password');
+
 				err.status = 401;
-				return next(err);
+
+				next(err);
 			} else {
-				console.log(user)
 				req.session.userId = user._id;
-				console.log(req.session)
+
 				return res.redirect('/profile');
 			}
 		});
 	} else {
 		var err = new Error('Email and password required.')
+
 		err.status = 401;
+
 		return next(err);
 	}
-
 });
 
 // GET /register
@@ -78,15 +73,12 @@ router.post('/register', (req, res, next) => {
 		 req.body.password &&
 		 req.body.confirmPassword
         ) {
-
-			//confirm that passwords match
-			if ( req.body.password != req.body.confirmPassword ) {
+			if ( req.body.password !== req.body.confirmPassword ) {
 				var err = new Error ('Passwords do not match.');
 				err.status = 400;
 				return next(err);
 			}
 
-			// create object w/form input
 			var userData = {
 				email: req.body.email,
 				firstName: req.body.firstName,
@@ -94,7 +86,7 @@ router.post('/register', (req, res, next) => {
 				favoriteBook: req.body.favoriteBook,
 				password: req.body.password
 			};
-			
+
 			// use schema's create method to insert document into mongo
 			User.create(userData, (error, user) => {
 				if (error) {
@@ -129,17 +121,4 @@ router.get('/contact', (req, res, next) => {
 
 
 
-module.exports = router; 
-
-
-
-
-
-
-
-
-
-
-
-
-
+module.exports = router;
