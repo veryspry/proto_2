@@ -1,0 +1,22 @@
+Notes
+
+
+SESSIONS
+
+	1. we can use sessions to help track logins
+
+	2. secret - secret session cookie is signed with this secret to prevent tampering
+
+	3. resave: true - forces session to be saved in the session store wether anything changed or not
+
+	4.   saveUninitialized: false - forces an unititialized session in the session store. (this is a new & unmodified session) we don't want to save so we set to false
+
+	5.  store: new MongoStore({ mongooseConnection: db }) - connect the sessions to mongo 
+
+
+
+Grabbing data from the request to store in database
+
+	1. we can give each input field a name attribute and call it what we like
+
+	2. we can access this by using the request object *** request.body.[name that you used] ***
